@@ -1,0 +1,66 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+public class Test {
+	int[][] grid = new int[4][4];
+	int size = 4;
+public static void main(String[] args) {
+	Test t = new Test();
+	t.setGrid();
+	t.printGrid();
+	t.moveLeft();
+	t.printGrid();
+}
+void printGrid() {
+	for(int i =0; i < size;i++) {
+		for(int j = 0;j < size; j++) {
+			System.out.print(grid[i][j]+" ");
+		}
+		System.out.println();
+	}
+}
+private void setGrid(){
+	Random random = new Random();
+	List<List<Integer>> emptySpaces = new ArrayList<>();
+	for(int i =0; i < size;i++) {
+		for(int j = 0;j < size; j++) {
+			if(grid[i][j] == 0) {
+				emptySpaces.add(Arrays.asList(i,j));
+			}
+		}
+	}
+	int p = random.nextInt(emptySpaces.size());
+	int x = emptySpaces.get(p).get(0);
+	int y = emptySpaces.get(p).get(1);
+	grid[x][y] = 2;
+}
+
+void moveLeft() {
+	for(int i =0; i < size;i++) {
+		int prev,prevy=-1;
+		if(grid[i][0] == 0) {
+			prev = grid[i][0];
+			prevy = -1;
+		}
+		else {
+			for(int j=1;j < size;j++) {
+				if(grid[i][j] == 0) {
+					prev = grid[i][j-1];
+					prevy = j-1;
+					break;
+				}
+				else if(grid[i][j] == grid[i][j-1]) {
+					grid[i][j-1] = grid[i][j-1]+grid[i][j];
+					prevy = j-1;
+					break;
+				}
+			}
+		}
+			for(int p = prevy+1;p < size-1;p++) {
+				grid[i][p] = grid[i][p+1];
+			}
+}
+}
+}

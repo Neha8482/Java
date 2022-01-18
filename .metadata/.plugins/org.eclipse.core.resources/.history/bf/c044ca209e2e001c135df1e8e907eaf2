@@ -1,0 +1,97 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
+
+class Node {
+    int data;
+    Node left, right;
+    
+    public Node(int data){
+        this.data = data;
+    }
+}
+class Solut{
+    
+    Map<Node,List<Integer>> mp = new HashMap<>();
+    int maxi=0;
+    
+    List<Integer> leng(Node node){
+       
+          List<Integer> l = new ArrayList<>();
+          int indl=0;
+         int indr =0;
+        if(node == null){
+            l.add(0);
+            l.add(0);
+            l.add(0);
+            l.add(0);
+        return l;
+        }
+      //  System.out.print(node.data);
+       
+        List<Integer> ld = leng(node.left);
+         List<Integer> rd = leng(node.right);
+         
+         //    System.out.print(node.data+"  ");
+         //    System.out.print(Math.max(ld.get(3),ld.get(2)));
+         //    System.out.println();
+            indl=1+Math.max(ld.get(2),rd.get(2));
+    
+       
+        
+         //    System.out.print(node.data+"  ");
+         //    System.out.print(Math.max(ld.get(3),ld.get(2)));
+         //    System.out.println();
+            indr=1+Math.max(ld.get(3),rd.get(3));
+    
+        int lt=node.data;
+        if(ld.get(2) > ld.get(3)){
+            lt=lt+ld.get(0);
+        }
+        else if(ld.get(2) < ld.get(3)){
+            lt=lt+ld.get(1);
+        }
+        else
+            lt =lt+  Math.max(ld.get(0),ld.get(1));
+     //    int lt = node.data +Math.max(ld.get(0),ld.get(1));
+        int rt=node.data;
+        if(rd.get(2) > rd.get(3)){
+            rt=rt+rd.get(0);
+        }
+        else if(rd.get(2) < rd.get(3)){
+            rt=rt+rd.get(1);
+        }
+        else
+            rt =rt+  Math.max(rd.get(0),rd.get(1));
+      //   int rt = node.data +Math.max(rd.get(0),rd.get(1));
+        l.add(lt);
+        l.add(rt);
+        l.add(indl);
+        l.add(indr);
+      /* System.out.print(l.get(2)+"  ");
+       System.out.print(l.get(3)+" ");
+       System.out.print(node.data);
+       System.out.println();*/
+        return l;
+    }
+    public int sumOfLongRootToLeafPath(Node root)
+    {
+        List<Integer> l= leng(root);
+        if(l.get(2) > l.get(3)){
+            return l.get(0);
+        }
+        else if(l.get(2) < l.get(3)){
+            return l.get(1);
+        }
+        else
+        return Math.max(l.get(0),l.get(1));
+    }
+}
+

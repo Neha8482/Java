@@ -1,0 +1,4 @@
+Month:roomrent_discount:food_discount
+Nov, Dec, Jan, Feb, Mar: 50:20
+Apr, May, Jun, July, Aug:20:10
+Sept, Oct:10:5

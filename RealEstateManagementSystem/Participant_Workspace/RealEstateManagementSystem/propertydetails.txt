@@ -1,0 +1,15 @@
+101,'Camp',1200,10000
+102,'Hadpsar',500,9000
+103,'Camp',800,10000
+104,'Kothrud',800,5000
+105,'Kalyani Nagar',1000,9000
+106,'Koregaon Park',1500,7000
+107,'Magarpatta',1500,5000
+108,'Kothrud',1000,6000
+109,'Magarpatta',750,5000
+110,'Hadpsar',1000,9000
+111,'Koregaon Park',2000,6000
+112,'Kalyani Nagar',1000,8000
+113,'Camp',1000,9000
+114,'Kothrud',800,5000
+115,'Magarpatta',850,5000

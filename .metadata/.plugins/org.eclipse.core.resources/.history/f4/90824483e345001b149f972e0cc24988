@@ -1,0 +1,209 @@
+package com.util;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.beans.DealType;
+import com.beans.Owner;
+import com.beans.Property;
+import com.beans.Transactions;
+import com.exception.InvalidPropertyIdException;
+
+public class RealEstateManagementServicesImpl implements RealEstateManagementServices{
+
+
+	private Connection connection;
+	private PreparedStatement preparedStatement;
+	public RealEstateManagementServicesImpl() {
+		connection = new  ConnectionManagerImpl().getConnection();
+	}
+
+	@Override
+	public Set<Owner> fetchOwnerData() {
+		Owner owner = null;
+		Set<Owner> owners = new HashSet<>();
+		String sql = "select * from owner";
+		try {
+			preparedStatement = connection.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while(resultSet.next()) {
+				int id = resultSet.getInt(1);
+				String name = resultSet.getString(2);
+				String address = resultSet.getString(3);
+				owner = new Owner(id,name,address,null);
+				owners.add(owner);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Owners");
+		return owners;
+	}
+
+	@Override
+	public List<Property> getPropertyDetails() {
+		Property property = null;
+		String st;
+		BufferedReader br =null;
+		List<Property> propertyDetails = new ArrayList<>();
+		try {
+			br =  new BufferedReader(new FileReader("D://propertydetails.txt"));
+			while((st = br.readLine()) != null) {
+				String[] split = st.split(",");
+				double area = Double.parseDouble(split[2]);
+				double rate = Double.parseDouble(split[2]);
+				double propertyCost = area * rate + (5/100 * area*rate);
+				double loanForProperty = propertyCost * 80/100 ;
+				boolean isExempted = false;
+				property = new Property(Integer.parseInt(split[0]),split[1], Double.parseDouble(split[2]), Double.parseDouble(split[2]),propertyCost,loanForProperty,isExempted);
+				propertyDetails.add(property);
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+		     try {
+				br.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		Collections.sort(propertyDetails, new Comparator<Property>() {
+			@Override
+			public int compare(Property o1, Property o2) {
+				Double p1= o1.getPropertyCost();
+				Double p2 = o2.getPropertyCost();
+				return p1.compareTo(p2);
+			}
+		});
+		System.out.println("Property");
+		return propertyDetails;
+	}
+
+	@Override
+	public List<Transactions> getTransactionDetails() {
+		Transactions transaction = null;
+		List<Transactions> transactionDetails = new ArrayList<>();
+		
+		String sql = "select * from property_transactions";
+		try {
+			preparedStatement = connection.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while(resultSet.next()) {
+			transaction = new Transactions(resultSet.getInt(1),resultSet.getInt(2),
+					resultSet.getString(3),resultSet.getInt(4),DealType.valueOf(resultSet.getString(5)),
+					resultSet.getDate(6),resultSet.getDouble(7));
+			transactionDetails.add(transaction);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Transactions");
+		return transactionDetails;
+	}
+
+	@Override
+	public List<Owner> getPropertiesOwnedByOwner(Set<Owner> owners, List<Transactions> transactions,
+			List<Property> properties) {
+		List<Owner> ownerprop  = new ArrayList<>();
+		for(Owner o : owners) {
+			List<Property> prop = new ArrayList<>();
+		     for(Transactions t : transactions) {
+				if(t.getOwnerId() == o.getOwnerId()) {
+					for(Property p : properties) {
+						if(t.getPropertyId() == p.getPropertyId() && t.getDealType() != DealType.sales) {
+							//System.out.println(p);
+							prop.add(new Property(p.getPropertyId(),p.getLocation(),p.getAreaInSqFeet(),p.getRatePerSqFeet(),p.getPropertyCost(),p.getLoanForProperty(),p.isExempted()));
+						}
+					}
+				}
+			}
+		     ownerprop.add(new Owner(o.getOwnerId(),o.getOwnerName(),o.getAddress(),prop));
+		}
+		return ownerprop;
+	}
+
+	@Override
+	public Map<Integer, List<Property>> getSoldProperties(List<Transactions> transactions, List<Property> properties) {
+		Map<Integer, List<Property>> ownedprops = new HashMap<>();
+		Collections.sort(transactions,new Comparator<Transactions>() {
+			@Override
+			public int compare(Transactions o1, Transactions o2) {
+				Integer i1 = o1.getOwnerId();
+				Integer i2= o2.getOwnerId();
+				return i1.compareTo(i2);
+			}
+		});
+		//int track = transactions.get(0).getOwnerId();
+		for(Transactions t : transactions) {
+			if(t.getDealType() == DealType.sales) {
+			if(ownedprops.containsKey(t.getOwnerId())) {
+				List<Property> p = new ArrayList<>();
+				p = ownedprops.get(t.getOwnerId());
+				for(Property pr : properties) {
+					if(t.getPropertyId() == pr.getPropertyId()) {
+						p.add(pr);
+					}
+				}
+			}else {
+				List<Property> p = new ArrayList<>();
+				for(Property pr : properties) {
+				if(t.getPropertyId()== pr.getPropertyId()) {
+					p.add(pr);
+				}
+				}
+				ownedprops.put(t.getOwnerId(), p);
+			}
+		}else {
+			continue;
+		}
+		}
+			
+		return ownedprops;
+	}
+
+	@Override
+	public List<Property> searchPropertiesWithExemption(Set<Owner> owners, List<Transactions> transactions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double getProfit(int propertyId, List<Property> properties, List<Transactions> transactions)
+			throws InvalidPropertyIdException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Map<Integer, List<Property>> getPropertiesSoldAtProfit(Set<Owner> owners, List<Transactions> transactions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getMaximumTaxPayer(Map<Integer, List<Property>> propertiesSoldWithProfit,
+			List<Transactions> transactions) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

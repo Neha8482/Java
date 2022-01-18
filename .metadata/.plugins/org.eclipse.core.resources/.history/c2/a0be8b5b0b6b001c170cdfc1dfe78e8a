@@ -1,0 +1,130 @@
+package Game;
+
+import java.util.Random;
+
+public class Grid {
+	int[][] grid;
+	int size;
+	
+	Grid(int size){
+		this.size = size;
+		grid = new int[this.size][this.size];
+		setGrid();
+		printGrid();
+	}
+	
+   public boolean checkGridFull() {
+		for(int i =0; i < size;i++) {
+			for(int j = 0;j < size; j++) {
+				if(grid[i][j] != 0)
+					return false;
+			}
+		}
+		return true;
+	}
+   public boolean check2048() {
+		for(int i =0; i < size;i++) {
+			for(int j = 0;j < size; j++) {
+				if(grid[i][j] == 2048)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	void printGrid() {
+		for(int i =0; i < size;i++) {
+			for(int j = 0;j < size; j++) {
+				System.out.print(grid[i][j]+" ");
+			}
+			System.out.println();
+		}
+	}
+	
+	private void setGrid(){
+		Random random = new Random();
+		int x = random.nextInt(2)%3;
+		int a = random.nextInt((int)Math.pow(2, x));
+		int b = random.nextInt((int)Math.pow(2, x));
+		grid[0][0] = a;
+		grid[2][0] = b;
+	}
+	
+	void moveLeft() {
+		for(int i =0; i < size;i++) {
+			int flag = 0;
+			for(int j = size-2;j > 0; j--) {
+				if(grid[i][j] != 0) {
+					flag =1;
+					if(grid[i][j] == grid[i][size-1]) {
+						grid[i][j] +=grid[i][j];
+					}else {
+						grid[i][j+1] = grid[i][size-1];
+					}
+					break;
+				}
+			}
+			if(flag ==0)
+				grid[i][0] = grid[i][size-1];
+		}
+		printGrid();
+	}
+	void movRight() {
+		for(int i =0; i < size;i++) {
+			int flag = 0;
+			for(int j = 1;j < size-1; j++) {
+				if(grid[i][j] != 0) {
+					flag =1;
+					if(grid[i][j] == grid[i][size-1]) {
+						grid[i][j] +=grid[i][j];
+					}else {
+						grid[i][j-1] = grid[i][size-1];
+					}
+					break;
+				}
+			}
+			if(flag == 0)
+				grid[i][size-1]= grid[i][0]; 
+		}
+		printGrid();
+	}
+	void moveUp() {
+		for(int j = size-2;j >= 0; j--) {
+			int flag = 0;
+			for(int i =0; i < size;i++){
+				if(grid[j][i] != 0) {
+					flag =1;
+					if(grid[j][i] == grid[j][size-1]) {
+						grid[j][i] +=grid[j][i];
+					}else {
+						grid[j][i+1] = grid[j][size-1];
+					}
+					break;
+				}
+			}
+			
+		}
+		printGrid();
+	}
+	void movedown() {
+		for(int j = 1;j < size-1; j--) {
+			int flag =0;
+			for(int i =0; i < size;i++) {
+				if(grid[j][i] != 0) {
+					flag =1;
+					if(grid[j][i] == grid[j][size-1]) {
+						grid[j][i] +=grid[j][i];
+					}else {
+						grid[j][i+1] = grid[j][size-1];
+					}
+					break;
+				}
+			}
+			if(flag ==0) 
+				grid[size-1][i] = grid[0][i]; 
+		}
+		printGrid();
+	}
+
+	
+}

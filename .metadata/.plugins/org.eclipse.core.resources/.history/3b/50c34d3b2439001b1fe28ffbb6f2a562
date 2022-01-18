@@ -1,0 +1,42 @@
+
+public class Matrix {
+
+	private int r;
+	private int c;
+	private int matrix[][];
+	public Matrix() {
+		matrix=new int[10][10];
+		
+	}
+	public Matrix(int r,int c){
+		this.r=r;
+		this.c=c;
+	}
+	
+	public void setElement(int r,int c,int value) {
+		for(int i=0; i < r;i++) {
+			for(int j =0; j <c; j++) {
+				if(value>0) {
+				matrix[r][c]=value;
+				System.out.println(value);
+			}
+				System.out.println();
+			}
+		}	
+	}
+	
+	public void transpose(int r,int c) {
+		for(int i=0;i<c;i++) {
+			for(int j=0;j<r;i++) {
+				System.out.print(matrix[c][r]);
+			}
+			System.out.println();
+		}
+	}
+	public static void main(String[] args) {
+		Matrix matrix = new Matrix();
+		matrix.setElement(3,6,4);
+		
+		
+	}
+}
